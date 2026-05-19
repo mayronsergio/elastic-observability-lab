@@ -1,37 +1,37 @@
 services:
     setup:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    container_name: elastic-setup
-    user: "0"
-    command: >
-      bash -c '
-        echo "Aguardando Elasticsearch ficar disponível...";
-
-        until curl -s -u elastic:${ELASTIC_PASSWORD} http://es01:9200 >/dev/null; do
-          echo "Aguardando Elasticsearch...";
-          sleep 5;
-        done;
-
-        echo "Configurando senha do usuario kibana_system...";
-
-        until curl -s -u elastic:${ELASTIC_PASSWORD} \
-          -X POST "http://es01:9200/_security/user/kibana_system/_password" \
-          -H "Content-Type: application/json" \
-          -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do
-            echo "Tentando configurar senha do kibana_system novamente...";
-            sleep 5;
-        done;
-
-        echo "Setup concluído.";
-      '
-    environment:
-      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      KIBANA_PASSWORD: ${KIBANA_PASSWORD}
-    depends_on:
-      es01:
-        condition: service_healthy
-    networks:
-      - elastic
+        image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+        container_name: elastic-setup
+        user: "0"
+        command: >
+          bash -c '
+            echo "Aguardando Elasticsearch ficar disponível...";
+    
+            until curl -s -u elastic:${ELASTIC_PASSWORD} http://es01:9200 >/dev/null; do
+              echo "Aguardando Elasticsearch...";
+              sleep 5;
+            done;
+    
+            echo "Configurando senha do usuario kibana_system...";
+    
+            until curl -s -u elastic:${ELASTIC_PASSWORD} \
+              -X POST "http://es01:9200/_security/user/kibana_system/_password" \
+              -H "Content-Type: application/json" \
+              -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do
+                echo "Tentando configurar senha do kibana_system novamente...";
+                sleep 5;
+            done;
+    
+            echo "Setup concluído.";
+          '
+        environment:
+          ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+          KIBANA_PASSWORD: ${KIBANA_PASSWORD}
+        depends_on:
+          es01:
+            condition: service_healthy
+        networks:
+          - elastic
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     container_name: es01
