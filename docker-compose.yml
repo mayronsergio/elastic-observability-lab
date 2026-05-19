@@ -1,7 +1,6 @@
 services:
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    container_name: elastic-setup
     user: "0"
     command: >
       bash -c '
@@ -31,7 +30,6 @@ services:
       - elastic
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    container_name: es01
     environment:
       - node.name=es01
       - cluster.name=${CLUSTER_NAME}
@@ -47,8 +45,8 @@ services:
       memlock:
         soft: -1
         hard: -1
-    ports:
-      - "${ES_PORT}:9200"
+    expose:
+      - "${ES_PORT}"
     volumes:
       - esdata01:/usr/share/elasticsearch/data
     healthcheck:
@@ -61,15 +59,14 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
-    container_name: kibana
     depends_on:
       setup:
         condition: service_completed_successfully
     environment:
       KIBANA_PASSWORD: ${KIBANA_PASSWORD}
       APM_SECRET_TOKEN: ${APM_SECRET_TOKEN}
-    ports:
-      - "${KIBANA_PORT}:5601"
+    expose:
+      - "${KIBANA_PORT}"
     volumes:
       - ./kibana.yml:/usr/share/kibana/config/kibana.yml:ro
     healthcheck:
@@ -82,7 +79,6 @@ services:
 
   fleet-server:
     image: docker.elastic.co/elastic-agent/elastic-agent:${STACK_VERSION}
-    container_name: fleet-server
     user: root
     depends_on:
       kibana:
@@ -107,9 +103,9 @@ services:
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
 
       - FLEET_INSECURE=true
-    ports:
-      - "${FLEET_PORT}:8220"
-      - "${APM_PORT}:8200"
+    expose:
+      - "${FLEET_PORT}"
+      - "${APM_PORT}"
     volumes:
       - fleetdata:/usr/share/elastic-agent/state
     networks:
