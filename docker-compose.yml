@@ -104,8 +104,8 @@ services:
 
       - FLEET_INSECURE=true
     expose:
-      - "${FLEET_PORT}"
-      - "${APM_PORT}"
+      - "8220"
+      - "8200"
     volumes:
       - fleetdata:/usr/share/elastic-agent/state
     networks:
@@ -117,4 +117,3 @@ volumes:
 
 networks:
   elastic:
-    name: elastic-lab
